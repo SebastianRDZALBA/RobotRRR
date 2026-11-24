@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Panel de control | Brazo robótico</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js?v=xy-neg56-verificada-2" defer></script>
+  <script src="serial.js?v=xy-neg56-verificada-2" defer></script>
+</head>
+<body>
+  <div class="shell">
+<nav class="toolbar" aria-label="Acciones principales">
+      <button id="btn-home" class="action-btn"><span class="action-icon">⌂</span> HOME</button>
+      <button id="btn-ready" class="action-btn"><span class="action-icon">◎</span> READY</button>
+      <button id="btn-stop" class="action-btn emergency"><span class="action-icon">⚠</span> PARO</button>
+    </nav>
+
+    <main class="dashboard">
+      <section class="left-column" aria-label="Cinemática">
+        <section class="panel form-panel">
+          <div class="panel-heading"><h2>Cinemática directa <span>(CD)</span></h2></div>
+          <div class="panel-body">
+            <div class="field-row"><label for="cd-b">Base</label><div class="input-wrap"><input id="cd-b" type="number" value="0" step="0.5" min="-140" max="105"/><span>°</span></div></div>
+            <div class="field-row"><label for="cd-h">Hombro</label><div class="input-wrap"><input id="cd-h" type="number" value="90" step="0.5" min="-89.25" max="131.025"/><span>°</span></div></div>
+            <div class="field-row"><label for="cd-c">Codo</label><div class="input-wrap"><input id="cd-c" type="number" value="90" step="0.5" min="0" max="180"/><span>°</span></div></div>
+            <div class="button-row two-up">
+              <button id="btn-cd" class="primary-btn"><span aria-hidden="true">▦</span> CALCULAR XYZ</button>
+              <button id="btn-cd-move" class="secondary-btn">▶ &nbsp; MOVER</button>
+            </div>
+            <div class="result-row" id="cd-result" aria-live="polite"><span>Resultado:</span><strong>Presiona calcular</strong></div>
+            
+          </div>
+        </section>
+        <section class="panel form-panel inverse-panel">
+          <div class="panel-heading"><h2>Cinemática inversa <span>(CI)</span></h2></div>
+          <div class="panel-body">
+            <div class="field-row"><label for="ci-x">X</label><div class="input-wrap"><input id="ci-x" type="number" value="227" step="0.1"/><span>mm</span></div></div>
+            <div class="field-row"><label for="ci-y">Y</label><div class="input-wrap"><input id="ci-y" type="number" value="-56" step="0.1"/><span>mm</span></div></div>
+            <div class="field-row"><label for="ci-z">Z</label><div class="input-wrap"><input id="ci-z" type="number" value="217" step="0.1"/><span>mm</span></div></div>
+            <button id="btn-ci" class="primary-btn full"><span aria-hidden="true">▦</span> CALCULAR ÁNGULOS</button>
+            <div class="solutions-title"><strong>Soluciones articulares</strong><span id="solutions-count">Sin calcular</span></div>
+            <div class="solutions" id="solutions" role="radiogroup" aria-label="Soluciones de cinemática inversa"><p class="empty-state">Las soluciones aparecerán aquí.</p></div>
+            <button id="btn-ci-move" class="secondary-btn full">▶ &nbsp; MOVER A POSICIÓN</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="center-column" aria-label="Control y registro de eventos">
+        <section class="panel wheel-panel">
+          <div class="panel-heading"><h2>Control manual de articulaciones</h2></div>
+          <div class="wheels-grid">
+            <div class="wheel-item"><div class="wheel-label">BASE / HOMBRO</div>
+              <div class="control-wheel" role="group" aria-label="Control manual de base y hombro">
+                <button class="wheel-sector sector-top" data-joint="b" data-direction="1" aria-label="Aumentar base"><span>Base +</span></button>
+                <button class="wheel-sector sector-right" data-joint="h" data-direction="1" aria-label="Aumentar hombro"><span>Hombro<br>+</span></button>
+                <button class="wheel-sector sector-bottom" data-joint="b" data-direction="-1" aria-label="Disminuir base"><span>Base −</span></button>
+                <button class="wheel-sector sector-left" data-joint="h" data-direction="-1" aria-label="Disminuir hombro"><span>Hombro<br>−</span></button>
+                <div class="wheel-hub" aria-hidden="true"><svg viewBox="0 0 60 60" fill="none"><path d="M8 48h44M13 48v-9h15v9M20 39l8-18 15 8M43 29l6-9" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="28" cy="21" r="4" stroke="currentColor" stroke-width="2.7"/><circle cx="43" cy="29" r="4" stroke="currentColor" stroke-width="2.7"/></svg></div>
+              </div>
+            </div>
+            <div class="wheel-item"><div class="wheel-label">CODO / PINZA</div>
+              <div class="control-wheel" role="group" aria-label="Control manual de codo y pinza">
+                <button class="wheel-sector sector-top" data-joint="c" data-direction="1" aria-label="Aumentar codo"><span>Codo +</span></button>
+                <button class="wheel-sector sector-right" data-grip="Cerrada" aria-label="Cerrar pinza"><span>Pinza<br>Cerrar</span></button>
+                <button class="wheel-sector sector-bottom" data-joint="c" data-direction="-1" aria-label="Disminuir codo"><span>Codo −</span></button>
+                <button class="wheel-sector sector-left" data-grip="Abierta" aria-label="Abrir pinza"><span>Pinza<br>Abrir</span></button>
+                <div class="wheel-hub" aria-hidden="true"><svg viewBox="0 0 60 60" fill="none"><path d="M20 8v19l-8 8 7 16M40 8v19l8 8-7 16M20 27l10 10 10-10M30 37v15" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+          </div>
+          <div class="manual-options">
+            <div class="option-title"><span>Incremento angular</span><span class="desc">Por pulsación</span></div>
+            <div id="step-options" class="step-options" role="group" aria-label="Incremento angular">
+              <button class="step-btn" data-step="0.5">0.5°</button><button class="step-btn active" data-step="1" aria-pressed="true">1°</button><button class="step-btn" data-step="5">5°</button><button class="step-btn" data-step="10">10°</button>
+            </div>
+            <div class="tiny-divider" role="separator"></div>
+
+          </div>
+          
+        </section>
+
+        <section class="panel console-panel">
+          <div class="panel-heading"><h2><span class="console-symbol">›_</span> Consola / Registro de eventos</h2><button id="btn-clear-log" class="ghost-icon" title="Limpiar registro" aria-label="Limpiar registro">⌫</button></div>
+          <div id="log-list" class="log-list" role="log" aria-live="polite" aria-relevant="additions"></div>
+          <div class="command-guide" id="command-guide">Comandos: <b>h</b> HOME · <b>l/r</b> dirección · <b>s/n</b> sí/no · <b>a</b> salir tras HOME · <b>p</b> estado · <b>Esc</b> paro controlado · <b>x</b> NEMA/PWM OFF</div>
+          <div class="serial-terminal" id="serial-terminal" hidden>
+            <label for="serial-entry">Respuesta o comando para el ESP32</label>
+            <div class="serial-terminal-row">
+              <input id="serial-entry" type="text" autocomplete="off" spellcheck="false" maxlength="64" placeholder="h, l, r, s, n, a, p, x...  (Esc = PARO)" />
+              <button id="usb-send-enter" type="button" title="Enviar respuesta o coordenada">Enviar ↵</button>
+            </div>
+
+          </div>
+          
+        </section>
+      </section>
+
+      <aside class="right-column" aria-label="Telemetría y estado">
+        <section class="panel telemetry-panel">
+          <div class="panel-heading"><h2>Telemetría / Estado</h2></div>
+          <div class="panel-body">
+            <div class="group-label">COORDENADAS CARTESIANAS</div>
+            <div class="readout"><span>P<sub>x</sub></span><strong id="tele-x">—</strong><small>mm</small></div>
+            <div class="readout"><span>P<sub>y</sub></span><strong id="tele-y">—</strong><small>mm</small></div>
+            <div class="readout"><span>P<sub>z</sub></span><strong id="tele-z">—</strong><small>mm</small></div>
+            <div class="inner-line"></div>
+            <div class="group-label">ÁNGULOS OPERATIVOS</div>
+            <div class="readout"><span>Base</span><strong id="tele-b">—</strong><small>°</small></div>
+            <div class="readout"><span>Hombro</span><strong id="tele-h">—</strong><small>°</small></div>
+            <div class="readout"><span>Codo</span><strong id="tele-c">—</strong><small>°</small></div>
+            <div class="inner-line"></div>
+            <div class="readout gripper-row"><span>Pinza</span><strong id="tele-grip">Cerrada</strong></div>
+            
+          </div>
+        </section>
+        <section class="panel system-panel">
+          <div class="panel-heading"><h2>Estado del sistema</h2></div>
+          <div class="panel-body">
+            <div class="status-row"><span>Conexión USB/UART</span><strong class="negative" id="status-usb">No conectada</strong></div>
+            <div class="status-row"><span>HOME</span><strong id="status-home">Pendiente</strong></div>
+            <div class="status-row"><span>READY</span><strong id="status-ready">No</strong></div>
+            <div class="status-row"><span>Movimiento</span><strong id="status-motion">Inactivo</strong></div>
+            <div class="status-row"><span>Buzzer</span><strong id="status-buzzer">Activado</strong></div>
+            <div class="status-row"><span>Drivers NEMA</span><strong id="status-actuators">Sin consultar</strong></div>
+            <div class="status-row"><span>PWM servos</span><strong id="status-pwm">Sin consultar</strong></div>
+            <div class="usb-actions" role="group" aria-label="Conexión con ESP32">
+              <button id="usb-connect" class="usb-button connect" type="button">Conectar USB</button>
+              <button id="usb-disconnect" class="usb-button" type="button" disabled>Desconectar</button>
+            </div>
+            <p id="usb-note" class="usb-note">Sin conexión: controles en modo demostración.</p>
+            
+          </div>
+        </section>
+      </aside>
+    </main>
+    
+  </div>
+
+  <dialog id="dialog" class="modal">
+    <div class="modal-inner"><div class="modal-symbol" aria-hidden="true">◎</div><h2 id="modal-title"></h2><p id="modal-message"></p><div id="modal-buttons" class="modal-buttons"></div></div>
+  </dialog>
+</body>
+</html>
